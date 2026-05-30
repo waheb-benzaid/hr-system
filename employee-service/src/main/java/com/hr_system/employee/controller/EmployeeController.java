@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -79,7 +80,7 @@ public class EmployeeController {
     public ResponseEntity<Page<EmployeeResponse>> getAllEmployees(
             @Parameter(description = "Filter by active status. `true` = active only, `false` = inactive only. Omit to return all.")
             @RequestParam(required = false) Boolean active,
-            @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
         Page<EmployeeResponse> employees = employeeService.getAllEmployees(active, pageable);
         return ResponseEntity.ok(employees);
     }

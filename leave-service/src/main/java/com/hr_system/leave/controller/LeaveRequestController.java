@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -86,7 +87,7 @@ public class LeaveRequestController {
     public ResponseEntity<Page<LeaveRequestResponse>> getLeaveRequestsByEmployee(
             @Parameter(description = "UUID of the employee whose leave requests to retrieve", required = true)
             @PathVariable UUID employeeId,
-            @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 10, sort = "createdAt") Pageable pageable) {
         Page<LeaveRequestResponse> leaves = leaveRequestService.getLeaveRequestsByEmployee(employeeId, pageable);
         return ResponseEntity.ok(leaves);
     }
