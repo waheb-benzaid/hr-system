@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>HR System — API Documentation</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css"/>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f1117;
+            min-height: 100vh;
+        }
+
+        /* ── Header ── */
+        .hub-header {
+            background: linear-gradient(135deg, #1a1d2e 0%, #16213e 50%, #0f3460 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+        }
+
+        .hub-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hub-title-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .hub-title h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+
+        .hub-title span {
+            font-size: 12px;
+            color: rgba(255,255,255,0.45);
+            font-weight: 400;
+            display: block;
+            margin-top: 1px;
+        }
+
+        /* ── Service Buttons ── */
+        .service-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .service-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1.5px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .service-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .service-btn.active {
+            border-color: transparent;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+
+        .service-btn.employee.active {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            box-shadow: 0 4px 16px rgba(79,70,229,0.4);
+        }
+
+        .service-btn.leave.active {
+            background: linear-gradient(135deg, #059669, #10b981);
+            box-shadow: 0 4px 16px rgba(5,150,105,0.4);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6b7280;
+            flex-shrink: 0;
+            transition: background 0.3s ease;
+        }
+
+        .status-dot.online { background: #34d399; box-shadow: 0 0 6px rgba(52,211,153,0.6); }
+        .status-dot.offline { background: #f87171; box-shadow: 0 0 6px rgba(248,113,113,0.6); }
+        .status-dot.checking { background: #fbbf24; animation: pulse 1s infinite; }
+
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        /* ── Swagger UI container ── */
+        #swagger-ui-container {
+            background: #fff;
+            min-height: calc(100vh - 72px);
+        }
+
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 72px);
+            background: #f8fafc;
+            gap: 16px;
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #4f46e5;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .offline-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 72px);
+            background: #f8fafc;
+            gap: 12px;
+        }
+
+        .offline-icon { font-size: 48px; }
+        .offline-title { font-size: 20px; font-weight: 600; color: #1e293b; }
+        .offline-msg { font-size: 14px; color: #64748b; text-align: center; max-width: 400px; line-height: 1.6; }
+        .offline-url { font-size: 13px; color: #94a3b8; font-family: monospace; margin-top: 4px; }
+
+        /* ── Override Swagger UI styles ── */
+        .swagger-ui .topbar { display: none !important; }
+        .swagger-ui .info { margin: 24px 0 16px !important; }
+        .swagger-ui .info .title { font-size: 28px !important; }
+    </style>
+</head>
+<body>
+
+<header class="hub-header">
+    <div class="hub-title">
+        <div class="hub-title-icon">🏢</div>
+        <div>
+            <h1>HR System</h1>
+            <span>API Documentation Hub</span>
+        </div>
+    </div>
+
+    <div class="service-selector">
+        <button class="service-btn employee active" id="btn-employee" onclick="switchService('employee')">
+            <span class="status-dot checking" id="dot-employee"></span>
+            👤 Employee Service
+        </button>
+        <button class="service-btn leave" id="btn-leave" onclick="switchService('leave')">
+            <span class="status-dot checking" id="dot-leave"></span>
+            📅 Leave Service
+        </button>
+    </div>
+</header>
+
+<div id="swagger-ui-container"></div>
+
+<script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+<script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
+<script>
+    const SERVICES = {
+        employee: {
+            url:   'http://localhost:8081/v3/api-docs',
+            health:'http://localhost:8081/api/v1/employees?page=0&size=1',
+            label: 'Employee Service',
+            port:  '8081'
+        },
+        leave: {
+            url:   'http://localhost:8082/v3/api-docs',
+            health:'http://localhost:8082/api/v1/leaves/employee/00000000-0000-0000-0000-000000000000',
+            label: 'Leave Service',
+            port:  '8082'
+        }
+    };
+
+    let currentService = 'employee';
+    let swaggerUI = null;
+
+    // ── Health check ──────────────────────────────────────────────────────────
+    async function checkHealth(serviceKey) {
+        const dot = document.getElementById('dot-' + serviceKey);
+        dot.className = 'status-dot checking';
+        try {
+            // Try to fetch the OpenAPI spec — if it responds (any status), service is up
+            const res = await fetch(SERVICES[serviceKey].url, { method: 'GET', signal: AbortSignal.timeout(3000) });
+            dot.className = res.ok ? 'status-dot online' : 'status-dot online';
+            return true;
+        } catch {
+            dot.className = 'status-dot offline';
+            return false;
+        }
+    }
+
+    // ── Switch service ────────────────────────────────────────────────────────
+    async function switchService(serviceKey) {
+        if (currentService === serviceKey && swaggerUI) return;
+        currentService = serviceKey;
+
+        // Update button states
+        document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + serviceKey).classList.add('active');
+
+        const container = document.getElementById('swagger-ui-container');
+        const service   = SERVICES[serviceKey];
+
+        // Show loading
+        container.innerHTML = `
+            <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <span>Loading ${service.label} documentation…</span>
+            </div>`;
+
+        // Check if service is up
+        const isOnline = await checkHealth(serviceKey);
+
+        if (!isOnline) {
+            container.innerHTML = `
+                <div class="offline-state">
+                    <div class="offline-icon">🔌</div>
+                    <div class="offline-title">${service.label} is offline</div>
+                    <div class="offline-msg">
+                        The service is not running or is unreachable.<br>
+                        Start the service and try again.
+                    </div>
+                    <div class="offline-url">http://localhost:${service.port}</div>
+                    <br>
+                    <button onclick="switchService('${serviceKey}')"
+                        style="padding:10px 24px;border-radius:8px;border:none;
+                               background:#4f46e5;color:#fff;cursor:pointer;font-size:14px;font-weight:600;">
+                        ↻ Retry
+                    </button>
+                </div>`;
+            return;
+        }
+
+        // Render Swagger UI
+        container.innerHTML = '<div id="swagger-ui"></div>';
+
+        swaggerUI = SwaggerUIBundle({
+            url:      service.url,
+            dom_id:   '#swagger-ui',
+            presets:  [SwaggerUIBundle.presets.apis],
+            layout:   'BaseLayout',
+            deepLinking:       true,
+            displayRequestDuration: true,
+            tryItOutEnabled:   true,
+            filter:            true,
+            syntaxHighlight: { activate: true, theme: 'agate' }
+        });
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    // Run health checks for both services on load
+    checkHealth('employee');
+    checkHealth('leave');
+    // Load employee service by default
+    switchService('employee');
+</script>
+</body>
+</html>
